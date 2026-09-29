@@ -6,27 +6,8 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXContainerItemProxy section */
-		7F560A1A306A388300A76BAC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 7F560A04306A388200A76BAC /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 7F560A0B306A388200A76BAC;
-			remoteInfo = Map;
-		};
-		7F560A24306A388300A76BAC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 7F560A04306A388200A76BAC /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 7F560A0B306A388200A76BAC;
-			remoteInfo = Map;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		7F560A0C306A388200A76BAC /* Map.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Map.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		7F560A19306A388300A76BAC /* MapTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MapTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		7F560A23306A388300A76BAC /* MapUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MapUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -35,34 +16,10 @@
 			path = Map;
 			sourceTree = "<group>";
 		};
-		7F560A1C306A388300A76BAC /* MapTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MapTests;
-			sourceTree = "<group>";
-		};
-		7F560A26306A388300A76BAC /* MapUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MapUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		7F560A09306A388200A76BAC /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7F560A16306A388300A76BAC /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7F560A20306A388300A76BAC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -76,8 +33,6 @@
 			isa = PBXGroup;
 			children = (
 				7F560A0E306A388200A76BAC /* Map */,
-				7F560A1C306A388300A76BAC /* MapTests */,
-				7F560A26306A388300A76BAC /* MapUITests */,
 				7F560A0D306A388200A76BAC /* Products */,
 			);
 			sourceTree = "<group>";
@@ -86,8 +41,6 @@
 			isa = PBXGroup;
 			children = (
 				7F560A0C306A388200A76BAC /* Map.app */,
-				7F560A19306A388300A76BAC /* MapTests.xctest */,
-				7F560A23306A388300A76BAC /* MapUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -117,52 +70,6 @@
 			productReference = 7F560A0C306A388200A76BAC /* Map.app */;
 			productType = "com.apple.product-type.application";
 		};
-		7F560A18306A388300A76BAC /* MapTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 7F560A30306A388300A76BAC /* Build configuration list for PBXNativeTarget "MapTests" */;
-			buildPhases = (
-				7F560A15306A388300A76BAC /* Sources */,
-				7F560A16306A388300A76BAC /* Frameworks */,
-				7F560A17306A388300A76BAC /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				7F560A1B306A388300A76BAC /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				7F560A1C306A388300A76BAC /* MapTests */,
-			);
-			name = MapTests;
-			packageProductDependencies = (
-			);
-			productName = MapTests;
-			productReference = 7F560A19306A388300A76BAC /* MapTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		7F560A22306A388300A76BAC /* MapUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 7F560A33306A388300A76BAC /* Build configuration list for PBXNativeTarget "MapUITests" */;
-			buildPhases = (
-				7F560A1F306A388300A76BAC /* Sources */,
-				7F560A20306A388300A76BAC /* Frameworks */,
-				7F560A21306A388300A76BAC /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				7F560A25306A388300A76BAC /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				7F560A26306A388300A76BAC /* MapUITests */,
-			);
-			name = MapUITests;
-			packageProductDependencies = (
-			);
-			productName = MapUITests;
-			productReference = 7F560A23306A388300A76BAC /* MapUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -175,14 +82,6 @@
 				TargetAttributes = {
 					7F560A0B306A388200A76BAC = {
 						CreatedOnToolsVersion = 26.3;
-					};
-					7F560A18306A388300A76BAC = {
-						CreatedOnToolsVersion = 26.3;
-						TestTargetID = 7F560A0B306A388200A76BAC;
-					};
-					7F560A22306A388300A76BAC = {
-						CreatedOnToolsVersion = 26.3;
-						TestTargetID = 7F560A0B306A388200A76BAC;
 					};
 				};
 			};
@@ -201,28 +100,12 @@
 			projectRoot = "";
 			targets = (
 				7F560A0B306A388200A76BAC /* Map */,
-				7F560A18306A388300A76BAC /* MapTests */,
-				7F560A22306A388300A76BAC /* MapUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		7F560A0A306A388200A76BAC /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7F560A17306A388300A76BAC /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7F560A21306A388300A76BAC /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -239,34 +122,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7F560A15306A388300A76BAC /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7F560A1F306A388300A76BAC /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		7F560A1B306A388300A76BAC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 7F560A0B306A388200A76BAC /* Map */;
-			targetProxy = 7F560A1A306A388300A76BAC /* PBXContainerItemProxy */;
-		};
-		7F560A25306A388300A76BAC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 7F560A0B306A388200A76BAC /* Map */;
-			targetProxy = 7F560A24306A388300A76BAC /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		7F560A2B306A388300A76BAC /* Debug */ = {
@@ -454,90 +310,6 @@
 			};
 			name = Release;
 		};
-		7F560A31306A388300A76BAC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = A8R858GPTL;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = jp.ac.jec.cm0130.MapTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Map.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Map";
-			};
-			name = Debug;
-		};
-		7F560A32306A388300A76BAC /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = A8R858GPTL;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = jp.ac.jec.cm0130.MapTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Map.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Map";
-			};
-			name = Release;
-		};
-		7F560A34306A388300A76BAC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = A8R858GPTL;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = jp.ac.jec.cm0130.MapUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Map;
-			};
-			name = Debug;
-		};
-		7F560A35306A388300A76BAC /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = A8R858GPTL;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = jp.ac.jec.cm0130.MapUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Map;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -555,24 +327,6 @@
 			buildConfigurations = (
 				7F560A2E306A388300A76BAC /* Debug */,
 				7F560A2F306A388300A76BAC /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		7F560A30306A388300A76BAC /* Build configuration list for PBXNativeTarget "MapTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				7F560A31306A388300A76BAC /* Debug */,
-				7F560A32306A388300A76BAC /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		7F560A33306A388300A76BAC /* Build configuration list for PBXNativeTarget "MapUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				7F560A34306A388300A76BAC /* Debug */,
-				7F560A35306A388300A76BAC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
