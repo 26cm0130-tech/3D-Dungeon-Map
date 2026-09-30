@@ -8,13 +8,18 @@ struct KeyEvent: TileEvent {
     }
 }
 
-/// G:ゴール(C担当)。鍵がないと入れない
+/// G:ゴール(C担当)。鍵が必要な面では、鍵がないと入れない
 struct GoalEvent: TileEvent {
     func blockReason(state: GameState) -> String? {
-        state.hasKey ? nil : "扉に鍵がかかっている"
+        // 鍵が必要な面(本番)で、鍵を持っていないときだけ入れない
+        if state.requiresKey && !state.hasKey {
+            return "扉に鍵がかかっている"
+        }
+        return nil
     }
 
     func onEnter(state: inout GameState) {
+        state.isCleared = true      // クリア状態にする(仕様書§3・§11)
         state.message = "ゴール!"
     }
 }

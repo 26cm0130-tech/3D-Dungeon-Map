@@ -3,12 +3,20 @@ import Combine
 
 /// ゲーム進行の管理。UIはここを通してのみ状態を変更する(UI仕様書§8)
 final class GameManager: ObservableObject {
-    let map: MapData
+    /// 現在の面(マップ、鍵の要否などの定義)
+    let stage: Stage
     @Published private(set) var state: GameState
 
-    init(map: MapData) {
-        self.map = map
-        self.state = GameState(start: map.startPosition, direction: map.initialDirection)
+    /// 現在の面のマップ
+    var map: MapData { stage.map }
+
+    init(stage: Stage) {
+        self.stage = stage
+        self.state = GameState(
+            start: stage.map.startPosition,
+            direction: stage.map.initialDirection,
+            requiresKey: stage.requiresKey
+        )
     }
 
     // MARK: 操作
