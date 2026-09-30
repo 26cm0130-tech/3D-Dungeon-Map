@@ -2,7 +2,7 @@ import SwiftUI
 
 /// プレイ画面。表示と入力の受け渡しだけを行い、ゲームの状態は GameManager が持つ
 struct ContentView: View {
-    @StateObject private var game = GameManager(map: Stages.honban)
+    @StateObject private var game = GameManager(stage: Stages.honban)
 
     var body: some View {
         VStack(spacing: 12) {
