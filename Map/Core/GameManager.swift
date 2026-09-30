@@ -14,11 +14,15 @@ final class GameManager: ObservableObject {
     // MARK: 操作
 
     func turnLeft() {
-        state.player.direction = state.player.direction.turnedLeft
+        var newState = state
+        newState.player.direction = newState.player.direction.turnedLeft
+        state = newState
     }
 
     func turnRight() {
-        state.player.direction = state.player.direction.turnedRight
+        var newState = state
+        newState.player.direction = newState.player.direction.turnedRight
+        state = newState
     }
 
     func moveForward() {
@@ -29,26 +33,17 @@ final class GameManager: ObservableObject {
         // マスごとの特殊処理(T・K・G)は Events に任せる
         let event = TileEvents.event(for: cell)
         if let reason = event?.blockReason(state: state) {
-            state.message = reason
+            var newState = state
+            newState.message = reason
+            state = newState
             return
         }
 
-        state.player.position = next
-        state.explored.insert(next)      // 新しいマスへ到達 → 探索済みにする
-        state.message = ""
-        event?.onEnter(state: &state)
-    }
-
-    // MARK: 3D描画用
-
-    /// 視点相対(前へd、右へi)のマスが壁か
-    func isWallRelative(_ d: Int, _ i: Int) -> Bool {
-        let forward = state.player.direction
-        let right = forward.turnedRight
-        let p = state.player.position
-        return map.isWall(
-            x: p.x + forward.dx * d + right.dx * i,
-            y: p.y + forward.dy * d + right.dy * i
-        )
+        var newState = state
+        newState.player.position = next
+        newState.explored.insert(next)
+        newState.message = ""
+        event?.onEnter(state: &newState)
+        state = newState
     }
 }
