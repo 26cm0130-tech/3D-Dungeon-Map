@@ -7,7 +7,10 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 12) {
             // ① 3Dダンジョン
-            DungeonView(isWall: game.isWallRelative)
+            DungeonView(
+                map: game.map,
+                player: game.state.player
+            )
 
             // ② オートマップ
             AutoMapView(
@@ -17,7 +20,6 @@ struct ContentView: View {
             )
             .frame(maxWidth: .infinity, minHeight: 120, maxHeight: .infinity)
 
-            // メッセージ
             Text(game.state.message)
                 .foregroundColor(.white)
                 .frame(height: 24)
