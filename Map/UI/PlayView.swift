@@ -5,6 +5,12 @@ struct PlayView: View {
     /// 現在のプレイ(AppFlow が作って渡す)
     @ObservedObject var game: GameManager
 
+    /// ギブアップが確定したときの処理(スタート画面へ戻る)
+    let onGiveUp: () -> Void
+
+    /// ギブアップの確認を表示中か
+    @State private var isConfirmingGiveUp = false
+
     var body: some View {
         VStack(spacing: 12) {
             // ① 3Dダンジョン
@@ -29,10 +35,20 @@ struct PlayView: View {
             CommandView(
                 onTurnLeft: game.turnLeft,
                 onForward: game.moveForward,
-                onTurnRight: game.turnRight
+                onTurnRight: game.turnRight,
+                onGiveUp: { isConfirmingGiveUp = true }   // まず確認を表示する
             )
         }
         .padding()
         .background(Color.black.ignoresSafeArea())
+        // ギブアップの確認(表示中は、後ろの操作を受け付けない)
+        .overlay {
+            if isConfirmingGiveUp {
+                GiveUpConfirmView(
+                    onYes: onGiveUp,
+                    onNo: { isConfirmingGiveUp = false }
+                )
+            }
+        }
     }
 }

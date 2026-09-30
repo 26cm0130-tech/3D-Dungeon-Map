@@ -17,7 +17,7 @@ struct ContentView: View {
             case .playing, .cleared:
                 // プレイ画面。クリアしたときは、上にクリア表示を重ねる
                 if let game = flow.game {
-                    PlayView(game: game)
+                    PlayView(game: game, onGiveUp: flow.returnToStart)
                         .overlay {
                             if flow.screen == .cleared {
                                 ClearView(onReturn: flow.returnToStart)
