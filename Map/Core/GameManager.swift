@@ -10,6 +10,9 @@ final class GameManager: ObservableObject {
     /// 現在の面のマップ
     var map: MapData { stage.map }
 
+    /// クリアしたときに呼ばれる(画面の切り替えに使う)
+    var onCleared: (() -> Void)?
+
     init(stage: Stage) {
         self.stage = stage
         self.state = GameState(
@@ -53,5 +56,10 @@ final class GameManager: ObservableObject {
         newState.message = ""
         event?.onEnter(state: &newState)
         state = newState
+
+        // クリア状態になったら、画面を切り替えるために知らせる
+        if newState.isCleared {
+            onCleared?()
+        }
     }
 }

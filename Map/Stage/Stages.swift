@@ -13,6 +13,9 @@ struct Stage {
 /// 各面のマップ定義(仕様書 付録A)
 /// # = 壁, . = 床, S = スタート, G = ゴール, T = トラップ, K = 鍵の宝箱
 enum Stages {
+    /// スタート画面に並べる面の一覧(表示順)
+    static let all: [Stage] = [tutorial, honban]
+
     /// チュートリアル(付録A.1)。S から G までの練習用。鍵は不要。
     /// 列は Excel の B〜F、行は 5〜14 に対応
     static let tutorial: Stage = make(

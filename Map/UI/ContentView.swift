@@ -1,38 +1,31 @@
 import SwiftUI
 
-/// プレイ画面。表示と入力の受け渡しだけを行い、ゲームの状態は GameManager が持つ
+/// アプリの最初の画面。画面の状態(AppFlow)に従って、
+/// スタート画面・プレイ画面・クリア表示を切り替える
 struct ContentView: View {
-    @StateObject private var game = GameManager(stage: Stages.honban)
+    @StateObject private var flow = AppFlow()
 
     var body: some View {
-        VStack(spacing: 12) {
-            // ① 3Dダンジョン
-            DungeonView(
-                map: game.map,
-                player: game.state.player
-            )
+        ZStack {
+            Color.black.ignoresSafeArea()
 
-            // ② オートマップ
-            AutoMapView(
-                map: game.map,
-                explored: game.state.explored,
-                player: game.state.player
-            )
-            .frame(maxWidth: .infinity, minHeight: 120, maxHeight: .infinity)
+            switch flow.screen {
+            case .start:
+                // スタート画面(面を選ぶ)
+                StartView(stages: Stages.all, onSelect: flow.startGame)
 
-            Text(game.state.message)
-                .foregroundColor(.white)
-                .frame(height: 24)
-
-            // ③ コマンド
-            CommandView(
-                onTurnLeft: game.turnLeft,
-                onForward: game.moveForward,
-                onTurnRight: game.turnRight
-            )
+            case .playing, .cleared:
+                // プレイ画面。クリアしたときは、上にクリア表示を重ねる
+                if let game = flow.game {
+                    PlayView(game: game)
+                        .overlay {
+                            if flow.screen == .cleared {
+                                ClearView(onReturn: flow.returnToStart)
+                            }
+                        }
+                }
+            }
         }
-        .padding()
-        .background(Color.black.ignoresSafeArea())
     }
 }
 
