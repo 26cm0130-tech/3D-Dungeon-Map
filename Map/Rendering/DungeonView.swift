@@ -26,6 +26,21 @@ struct DungeonView: View {
         return map.isWall(x: x, y: y)
     }
 
+    /// 深さ d のマスについて、左右どこまで調べるかと、描く順番を返す(外側 → 中央の順)。
+    /// 奥へ行くほど、画面に映る横の範囲が広がる(横位置 i のマスが画面に入るのは |i| < d + 2 のとき)。
+    /// そのため、奥のマスほど、外側まで調べる。外側から先に描くのは、
+    /// 奥の壁を、手前の壁で隠すため
+    private func lateralOrder(depth d: Int) -> [Int] {
+        let limit = d + 1
+        var order: [Int] = []
+        for n in stride(from: limit, through: 1, by: -1) {
+            order.append(-n)
+            order.append(n)
+        }
+        order.append(0)
+        return order
+    }
+
     var body: some View {
         Canvas { ctx, size in
             let f = Double(size.width) / 2          // 画面の半幅。近い横壁が画面端に届く値
@@ -55,7 +70,7 @@ struct DungeonView: View {
 
             // 奥 → 手前、外側 → 中央 の順に描く(画家のアルゴリズム)
             for d in stride(from: depth, through: 0, by: -1) {
-                for i in [-2, 2, -1, 1, 0] {
+                for i in lateralOrder(depth: d) {
                     // 壁のマスは、中に立てないので描かない
                     if isWallRelative(d, i) { continue }
 
