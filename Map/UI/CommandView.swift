@@ -9,7 +9,7 @@ struct CommandView: View {
     let onGiveUp: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             // 移動用の3つのボタン(同じ大きさで横に並べる)
             HStack(spacing: 8) {
                 commandButton("左旋回", onTurnLeft)
@@ -17,13 +17,13 @@ struct CommandView: View {
                 commandButton("右旋回", onTurnRight)
             }
 
-            // ギブアップは、押し間違えにくいように、移動用ボタンとは別の位置に小さく置く
+            // ギブアップは、押し間違えにくいように、移動用ボタンとは別の位置に小さく置く(高さは、指で押しやすい44)
             HStack {
                 Spacer()
                 Button(action: onGiveUp) {
                     Text("ギブアップ")
                         .font(.system(size: 14, weight: .bold))
-                        .frame(width: 120, height: 36)
+                        .frame(width: 120, height: 44)
                         .background(Color.black)
                         .foregroundColor(Color.white.opacity(0.8))
                         .overlay(Rectangle().stroke(Color.white.opacity(0.6), lineWidth: 1))

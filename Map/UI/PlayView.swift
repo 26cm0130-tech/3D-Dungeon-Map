@@ -19,7 +19,13 @@ struct PlayView: View {
                 player: game.state.player
             )
 
-            // ② オートマップ
+            // ② メッセージ(1行分の高さを確保し、画面が動かないようにする)
+            Text(game.state.message)
+                .font(.system(size: 15))
+                .foregroundColor(.white)
+                .frame(height: 24)
+
+            // ③ オートマップ
             AutoMapView(
                 map: game.map,
                 explored: game.state.explored,
@@ -27,11 +33,7 @@ struct PlayView: View {
             )
             .frame(maxWidth: .infinity, minHeight: 120, maxHeight: .infinity)
 
-            Text(game.state.message)
-                .foregroundColor(.white)
-                .frame(height: 24)
-
-            // ③ コマンド
+            // ④ コマンド
             CommandView(
                 onTurnLeft: game.turnLeft,
                 onForward: game.moveForward,
