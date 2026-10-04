@@ -1,20 +1,34 @@
 import SwiftUI
 
-/// クリア表示(仕様書§13.1、UI仕様書§14)。プレイ画面の上に重ねて表示する
+/// クリア表示(仕様書§13.1、UI仕様書§14)。プレイ画面の上に重ねて、画面全体を覆って表示する
 struct ClearView: View {
     /// 「スタート画面へ」が押されたときの処理
     let onReturn: () -> Void
 
     var body: some View {
         ZStack {
-            // 後ろのプレイ画面を操作できないように、画面全体を覆う
-            Color.black.opacity(0.8)
+            // 後ろのプレイ画面を操作できないように、画面全体を黒で覆う
+            Color.black
                 .ignoresSafeArea()
 
-            VStack(spacing: 24) {
-                Text("ゲームクリア!")
-                    .font(.system(size: 28, weight: .bold))
+            // 画面全体を囲む、細い白の枠
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.white.opacity(0.8), lineWidth: 2)
+                .padding(16)
+
+            VStack(spacing: 16) {
+                // 小さい画面でも、1行に収まるように縮小できるようにする
+                Text("おめでとう!")
+                    .font(.system(size: 60, weight: .bold))
+                    .tracking(2)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
                     .foregroundColor(.white)
+
+                Text("ゲームクリア")
+                    .font(.system(size: 20))
+                    .foregroundColor(.white)
+                    .padding(.bottom, 40)
 
                 Button(action: onReturn) {
                     Text("スタート画面へ")
@@ -24,9 +38,9 @@ struct ClearView: View {
                         .foregroundColor(.white)
                         .overlay(Rectangle().stroke(Color.white, lineWidth: 2))
                 }
-                .frame(maxWidth: 320)
+                .frame(maxWidth: 280)
             }
-            .padding()
+            .padding(32)
         }
     }
 }
