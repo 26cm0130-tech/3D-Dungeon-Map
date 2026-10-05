@@ -3,8 +3,9 @@ import Foundation
 /// K:鍵・宝箱(C担当)。取得すると hasKey が true になる
 struct KeyEvent: TileEvent {
     func onEnter(state: inout GameState) {
+        let alreadyHadKey = state.hasKey
         state.hasKey = true
-        state.message = "鍵を手に入れた"
+        state.message = alreadyHadKey ? "空の宝箱がある" : "鍵を手に入れた"
     }
 }
 
