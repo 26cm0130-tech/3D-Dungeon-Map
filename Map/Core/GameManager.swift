@@ -18,7 +18,8 @@ final class GameManager: ObservableObject {
         self.state = GameState(
             start: stage.map.startPosition,
             direction: stage.map.initialDirection,
-            requiresKey: stage.requiresKey
+            requiresKey: stage.requiresKey,
+            isStepByStepTutorial: stage.isStepByStepTutorial
         )
     }
 
@@ -27,19 +28,28 @@ final class GameManager: ObservableObject {
     func turnLeft() {
         var newState = state
         newState.player.direction = newState.player.direction.turnedLeft
+        newState.message = ""
+        newState.recordTutorialAction(.turn)
         state = newState
     }
 
     func turnRight() {
         var newState = state
         newState.player.direction = newState.player.direction.turnedRight
+        newState.message = ""
+        newState.recordTutorialAction(.turn)
         state = newState
     }
 
     func moveForward() {
         let next = state.player.position.moved(state.player.direction)
         let cell = map.cell(at: next)
-        if cell.isWall { return }
+        if cell.isWall {
+            var newState = state
+            newState.message = "前方は壁です。左右に向きを変えて進路を探しましょう。"
+            state = newState
+            return
+        }
 
         // マスごとの特殊処理(T・K・G)は Events に任せる
         let event = TileEvents.event(for: cell)
@@ -54,6 +64,7 @@ final class GameManager: ObservableObject {
         newState.player.position = next
         newState.explored.insert(next)
         newState.message = ""
+        newState.recordTutorialAction(.moveForward)
         event?.onEnter(state: &newState)
         state = newState
 
