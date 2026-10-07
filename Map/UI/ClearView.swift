@@ -1,9 +1,12 @@
+import AVFoundation
 import SwiftUI
 
 /// クリア表示(仕様書§13.1、UI仕様書§14)。プレイ画面の上に重ねて、画面全体を覆って表示する
 struct ClearView: View {
     /// 「スタート画面へ」が押されたときの処理
     let onReturn: () -> Void
+
+    @State private var clearAudioPlayer: AVAudioPlayer?
 
     var body: some View {
         ZStack {
@@ -39,6 +42,17 @@ struct ClearView: View {
                 .frame(maxWidth: 280)
             }
             .padding(32)
+        }
+        .onAppear {
+            guard let url = Bundle.main.url(forResource: "レトロなゲームクリア音", withExtension: "mp3"),
+                  let player = try? AVAudioPlayer(contentsOf: url) else { return }
+            player.prepareToPlay()
+            player.play()
+            clearAudioPlayer = player
+        }
+        .onDisappear {
+            clearAudioPlayer?.stop()
+            clearAudioPlayer = nil
         }
     }
 }

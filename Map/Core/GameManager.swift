@@ -26,6 +26,7 @@ final class GameManager: ObservableObject {
     // MARK: 操作
 
     func turnLeft() {
+        guard !state.isCleared else { return }
         var newState = state
         newState.player.direction = newState.player.direction.turnedLeft
         newState.message = ""
@@ -34,6 +35,7 @@ final class GameManager: ObservableObject {
     }
 
     func turnRight() {
+        guard !state.isCleared else { return }
         var newState = state
         newState.player.direction = newState.player.direction.turnedRight
         newState.message = ""
@@ -42,6 +44,7 @@ final class GameManager: ObservableObject {
     }
 
     func moveForward() {
+        guard !state.isCleared else { return }
         let next = state.player.position.moved(state.player.direction)
         let cell = map.cell(at: next)
         if cell.isWall {

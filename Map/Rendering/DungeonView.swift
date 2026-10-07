@@ -13,6 +13,11 @@ struct DungeonView: View {
     /// 視点相対(前へd、右へi)のマスが壁か。
     /// プレイヤーの向きに合わせて、マップ上の絶対座標へ変換して調べる
     private func isWallRelative(_ d: Int, _ i: Int) -> Bool {
+        map.cell(at: positionRelative(d, i)).isWall
+    }
+
+    /// 視点相対(前へd、右へi)のマスをマップ座標に変換する。
+    private func positionRelative(_ d: Int, _ i: Int) -> GridPos {
         let forward = player.direction          // 前方向
         let right = forward.turnedRight         // 右方向
 
@@ -23,7 +28,7 @@ struct DungeonView: View {
             + forward.dy * d
             + right.dy * i
 
-        return map.isWall(x: x, y: y)
+        return GridPos(x: x, y: y)
     }
 
     /// 深さ d のマスについて、左右どこまで調べるかと、描く順番を返す(外側 → 中央の順)。
@@ -51,6 +56,8 @@ struct DungeonView: View {
             func project(_ x: Double, _ y: Double, _ z: Double) -> CGPoint {
                 CGPoint(x: cx + f * x / z, y: cy - f * y / z)
             }
+
+            let doorImage = ctx.resolve(Image("door"))
 
             func polygon(_ points: [CGPoint]) -> Path {
                 var path = Path()
@@ -177,6 +184,21 @@ struct DungeonView: View {
                         project(xl, -0.5, z1), project(xr, -0.5, z1),
                         project(xr, -0.5, z0), project(xl, -0.5, z0)
                     ], depth: d, seed: i + d * 5, kind: 1)
+
+                    // ゴールが正面2マス以内に見えたら、ゴールの手前側に扉を描く。
+                    if i == 0, (1...2).contains(d), map.cell(at: positionRelative(d, i)) == .goal {
+                        let topLeft = project(xl, 0.5, z0)
+                        let bottomRight = project(xr, -0.5, z0)
+                        ctx.draw(
+                            doorImage,
+                            in: CGRect(
+                                x: topLeft.x,
+                                y: topLeft.y,
+                                width: bottomRight.x - topLeft.x,
+                                height: bottomRight.y - topLeft.y
+                            )
+                        )
+                    }
 
                     // 正面の壁
                     if isWallRelative(d + 1, i) {

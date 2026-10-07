@@ -5,7 +5,6 @@ import SwiftUI
 struct KeyAcquisitionView: View {
     let hasKey: Bool
     let isAcquiringKey: Bool
-    let isFacingChest: Bool
     let onFinished: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -24,17 +23,15 @@ struct KeyAcquisitionView: View {
                     Color.black.opacity(0.62)
 
                     ZStack {
-                        if isFacingChest {
-                            Image("CloseBox")
-                                .resizable()
-                                .scaledToFit()
-                                .opacity(chestIsOpen ? 0 : 1)
+                        Image("CloseBox")
+                            .resizable()
+                            .scaledToFit()
+                            .opacity(chestIsOpen ? 0 : 1)
 
-                            Image("OpenBox")
-                                .resizable()
-                                .scaledToFit()
-                                .opacity(chestIsOpen ? 1 : 0)
-                        }
+                        Image("OpenBox")
+                            .resizable()
+                            .scaledToFit()
+                            .opacity(chestIsOpen ? 1 : 0)
                     }
                     .frame(width: geometry.size.width * 0.86)
                     .animation(.easeInOut(duration: 0.22), value: chestIsOpen)
@@ -58,16 +55,14 @@ struct KeyAcquisitionView: View {
                             y: geometry.size.height * 0.57 + keyRise
                         )
                 } else {
-                    if isFacingChest {
-                        Image(hasKey ? "OpenBox" : "CloseBox")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: geometry.size.width * 0.86)
-                            .position(
-                                x: geometry.size.width / 2,
-                                y: geometry.size.height * 0.60
-                            )
-                    }
+                    Image(hasKey ? "OpenBox" : "CloseBox")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: geometry.size.width * 0.86)
+                        .position(
+                            x: geometry.size.width / 2,
+                            y: geometry.size.height * 0.60
+                        )
                 }
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
@@ -120,7 +115,6 @@ struct KeyAcquisitionView: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(isAcquiringKey ? "宝箱から鍵を手に入れた" : (hasKey ? "空の宝箱" : "鍵の入った閉じた宝箱"))
-        .accessibilityHidden(!isFacingChest && !isAcquiringKey)
         .allowsHitTesting(false)
     }
 
