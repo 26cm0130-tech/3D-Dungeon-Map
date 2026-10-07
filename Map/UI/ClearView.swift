@@ -34,10 +34,8 @@ struct ClearView: View {
                     Text("スタート画面へ")
                         .font(.system(size: 18, weight: .bold))
                         .frame(maxWidth: .infinity, minHeight: 56)
-                        .background(Color.black)
-                        .foregroundColor(.white)
-                        .overlay(Rectangle().stroke(Color.white, lineWidth: 2))
                 }
+                .buttonStyle(DungeonPressButtonStyle())
                 .frame(maxWidth: 280)
             }
             .padding(32)

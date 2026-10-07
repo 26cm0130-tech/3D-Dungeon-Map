@@ -34,9 +34,7 @@ struct GiveUpConfirmView: View {
             Text(title)
                 .font(.system(size: 18, weight: .bold))
                 .frame(maxWidth: .infinity, minHeight: 56)
-                .background(Color.black)
-                .foregroundColor(.white)
-                .overlay(Rectangle().stroke(Color.white, lineWidth: 2))
         }
+        .buttonStyle(DungeonPressButtonStyle())
     }
 }
