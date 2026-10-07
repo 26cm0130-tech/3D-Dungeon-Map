@@ -23,9 +23,17 @@ struct PlayView: View {
         game.state.player.direction == .west
     }
 
+    /// イベントの状況メッセージを優先し、なければ現在のチュートリアル案内を表示する
+    private var displayedMessage: String {
+        if !game.state.message.isEmpty {
+            return game.state.message
+        }
+        return game.state.tutorialStep?.instruction ?? ""
+    }
+
     var body: some View {
         VStack(spacing: 12) {
-            // ① 3Dダンジョン
+            // ① ダンジョン画面
             DungeonView(
                 map: game.map,
                 player: game.state.player
@@ -47,13 +55,17 @@ struct PlayView: View {
                 }
             }
 
-            // ② メッセージ(1行分の高さを確保し、画面が動かないようにする)
-            Text(game.state.message)
-                .font(.system(size: 15))
+            // ② メッセージ(段階案内と状況メッセージを、固定の高さに表示する)
+            Text(displayedMessage)
+                .font(.system(size: 14))
                 .foregroundColor(.white)
-                .frame(height: 24)
+                .lineLimit(3)
+                .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.85)
+                .frame(maxWidth: .infinity)
+                .frame(height: 48)
 
-            // ③ オートマップ
+            // ③ 探索マップ
             AutoMapView(
                 map: game.map,
                 explored: game.state.explored,

@@ -5,16 +5,21 @@ struct KeyEvent: TileEvent {
     func onEnter(state: inout GameState) {
         let alreadyHadKey = state.hasKey
         state.hasKey = true
-        state.message = alreadyHadKey ? "空の宝箱がある" : "鍵を手に入れた"
+        if !alreadyHadKey && state.tutorialStep == .findKey {
+            state.tutorialStep = .reachGoal
+            state.message = "鍵を手に入れた。ゴールへ進みましょう。"
+        } else {
+            state.message = alreadyHadKey ? "空の宝箱がある" : "鍵を手に入れた"
+        }
     }
 }
 
 /// G:ゴール(C担当)。鍵が必要な面では、鍵がないと入れない
 struct GoalEvent: TileEvent {
     func blockReason(state: GameState) -> String? {
-        // 鍵が必要な面(本番)で、鍵を持っていないときだけ入れない
+        // 鍵が必要な面で、鍵を持っていないときだけ入れない
         if state.requiresKey && !state.hasKey {
-            return "扉に鍵がかかっている"
+            return "ゴールの扉には鍵が必要です。まず鍵を探しましょう。"
         }
         return nil
     }
