@@ -175,6 +175,9 @@ struct DungeonView: View {
                     let z1 = Double(d) + 1.5    // このマスの奥側の奥行き
                     let xl = Double(i) - 0.5    // このマスの左端の横位置
                     let xr = Double(i) + 0.5    // このマスの右端の横位置
+                    let showsGoalDoor = i == 0
+                        && (1...2).contains(d)
+                        && map.cell(at: positionRelative(d, i)) == .goal
 
                     stoneSurface([
                         project(xl, 0.5, z0), project(xr, 0.5, z0),
@@ -185,19 +188,12 @@ struct DungeonView: View {
                         project(xr, -0.5, z0), project(xl, -0.5, z0)
                     ], depth: d, seed: i + d * 5, kind: 1)
 
-                    // ゴールが正面2マス以内に見えたら、ゴールの手前側に扉を描く。
-                    if i == 0, (1...2).contains(d), map.cell(at: positionRelative(d, i)) == .goal {
-                        let topLeft = project(xl, 0.5, z0)
-                        let bottomRight = project(xr, -0.5, z0)
-                        ctx.draw(
-                            doorImage,
-                            in: CGRect(
-                                x: topLeft.x,
-                                y: topLeft.y,
-                                width: bottomRight.x - topLeft.x,
-                                height: bottomRight.y - topLeft.y
-                            )
-                        )
+                    // ドア画像の透過部分から奥が見えないよう、ゴール面に石壁を敷く。
+                    if showsGoalDoor {
+                        stoneSurface([
+                            project(xl, 0.5, z0), project(xr, 0.5, z0),
+                            project(xr, -0.5, z0), project(xl, -0.5, z0)
+                        ], depth: d, seed: i + d * 17, kind: 0)
                     }
 
                     // 正面の壁
@@ -222,6 +218,21 @@ struct DungeonView: View {
                             project(xr, 0.5, z0), project(xr, 0.5, z1),
                             project(xr, -0.5, z1), project(xr, -0.5, z0)
                         ], depth: d, seed: i + d * 13 + 2, kind: 0)
+                    }
+
+                    // 周囲の石壁を描いた後にドアを置き、レンガ面との重なりを防ぐ。
+                    if showsGoalDoor {
+                        let topLeft = project(xl, 0.5, z0)
+                        let bottomRight = project(xr, -0.5, z0)
+                        ctx.draw(
+                            doorImage,
+                            in: CGRect(
+                                x: topLeft.x,
+                                y: topLeft.y,
+                                width: bottomRight.x - topLeft.x,
+                                height: bottomRight.y - topLeft.y
+                            )
+                        )
                     }
                 }
             }
