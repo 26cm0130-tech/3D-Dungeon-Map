@@ -18,11 +18,6 @@ struct PlayView: View {
         game.map.cell(at: game.state.player.position) == .key
     }
 
-    /// 添付画面で正面を示す、カーソルが左（西）を指す向き
-    private var isFacingKeyChest: Bool {
-        game.state.player.direction == .west
-    }
-
     /// イベントの状況メッセージを優先し、なければ現在のチュートリアル案内を表示する
     private var displayedMessage: String {
         if !game.state.message.isEmpty {
@@ -43,7 +38,6 @@ struct PlayView: View {
                     KeyAcquisitionView(
                         hasKey: game.state.hasKey,
                         isAcquiringKey: isShowingKeyAcquisition,
-                        isFacingChest: isFacingKeyChest,
                         onFinished: {
                             withAnimation(.easeOut(duration: 0.2)) {
                                 isShowingKeyAcquisition = false
