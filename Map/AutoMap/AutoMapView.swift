@@ -4,6 +4,7 @@ import SwiftUI
 struct AutoMapView: View {
     let map: MapData
     let explored: Set<GridPos>
+    let traps: [GridPos: TrapKind]
     let player: Player
 
     var body: some View {
@@ -49,7 +50,8 @@ struct AutoMapView: View {
                 }
 
                 // 到達済みの特殊マスだけ記号を表示(未到達のT/K/Gは出さない)
-                if let symbol = map.cell(at: pos).mapSymbol, pos != player.position {
+                let symbol = traps[pos]?.mapSymbol ?? map.cell(at: pos).mapSymbol
+                if let symbol, pos != player.position {
                     ctx.draw(
                         Text(symbol)
                             .font(.system(size: cell * 0.6, weight: .bold))

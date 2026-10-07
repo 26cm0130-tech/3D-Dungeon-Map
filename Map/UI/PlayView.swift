@@ -57,6 +57,7 @@ struct PlayView: View {
             AutoMapView(
                 map: game.map,
                 explored: game.state.explored,
+                traps: game.state.traps,
                 player: game.state.player
             )
             .frame(maxWidth: .infinity, minHeight: 120, maxHeight: .infinity)

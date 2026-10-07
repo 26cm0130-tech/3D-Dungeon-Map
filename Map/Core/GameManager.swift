@@ -15,11 +15,13 @@ final class GameManager: ObservableObject {
 
     init(stage: Stage) {
         self.stage = stage
-        self.state = GameState(
+        var initialState = GameState(
             start: stage.map.startPosition,
             direction: stage.map.initialDirection,
             requiresKey: stage.requiresKey
         )
+        initialState.traps = TrapPlacement.make(in: stage.map)
+        self.state = initialState
     }
 
     // MARK: 操作
@@ -37,20 +39,40 @@ final class GameManager: ObservableObject {
     }
 
     func moveForward() {
-        let next = state.player.position.moved(state.player.direction)
+        var stateForMove = state
+        if stateForMove.hasMovementHindrance {
+            guard stateForMove.isWaitingForSecondForwardPress else {
+                stateForMove.isWaitingForSecondForwardPress = true
+                stateForMove.message = "進行を妨害された"
+                state = stateForMove
+                return
+            }
+            stateForMove.isWaitingForSecondForwardPress = false
+        }
+
+        let next = stateForMove.player.position.moved(stateForMove.player.direction)
         let cell = map.cell(at: next)
-        if cell.isWall { return }
+        if cell.isWall {
+            state = stateForMove
+            return
+        }
 
         // マスごとの特殊処理(T・K・G)は Events に任せる
-        let event = TileEvents.event(for: cell)
-        if let reason = event?.blockReason(state: state) {
-            var newState = state
+        let event: (any TileEvent)?
+        if let trapKind = stateForMove.traps[next] {
+            let destinations = map.normalFloorPositions.filter { stateForMove.traps[$0] == nil }
+            event = TrapEvent(kind: trapKind, warpDestinations: destinations)
+        } else {
+            event = TileEvents.event(for: cell)
+        }
+        if let reason = event?.blockReason(state: stateForMove) {
+            var newState = stateForMove
             newState.message = reason
             state = newState
             return
         }
 
-        var newState = state
+        var newState = stateForMove
         newState.player.position = next
         newState.explored.insert(next)
         newState.message = ""

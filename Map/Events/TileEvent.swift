@@ -19,7 +19,6 @@ extension TileEvent {
 enum TileEvents {
     static func event(for cell: MapCell) -> (any TileEvent)? {
         switch cell {
-        case .trap: return TrapEvent()
         case .key:  return KeyEvent()
         case .goal: return GoalEvent()
         case .wall, .floor, .start: return nil

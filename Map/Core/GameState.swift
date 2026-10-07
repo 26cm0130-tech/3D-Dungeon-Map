@@ -10,6 +10,12 @@ struct GameState {
     var isCleared: Bool = false
     /// 探索済みのマス(オートマップ用)
     var explored: Set<GridPos>
+    /// 面の開始時に配置したトラップ
+    var traps: [GridPos: TrapKind] = [:]
+    /// 進行妨害トラップが有効か
+    var hasMovementHindrance: Bool = false
+    /// 進行妨害中の、前進ボタン1回目の入力を受け取った状態か
+    var isWaitingForSecondForwardPress: Bool = false
     /// 画面に表示するメッセージ
     var message: String = ""
 
