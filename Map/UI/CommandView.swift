@@ -24,10 +24,8 @@ struct CommandView: View {
                     Text("ギブアップ")
                         .font(.system(size: 14, weight: .bold))
                         .frame(width: 120, height: 44)
-                        .background(Color.black)
-                        .foregroundColor(Color.white.opacity(0.8))
-                        .overlay(Rectangle().stroke(Color.white.opacity(0.6), lineWidth: 1))
                 }
+                .buttonStyle(DungeonPressButtonStyle())
             }
         }
     }
@@ -37,9 +35,32 @@ struct CommandView: View {
             Text(title)
                 .font(.system(size: 18, weight: .bold))
                 .frame(maxWidth: .infinity, minHeight: 56)
-                .background(Color.black)
-                .foregroundColor(.white)
-                .overlay(Rectangle().stroke(Color.white, lineWidth: 2))
         }
+        .buttonStyle(DungeonPressButtonStyle())
+    }
+}
+
+/// 押している間だけ色・枠・大きさを変え、操作を受け付けたことを伝える。
+struct DungeonPressButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .background(
+                configuration.isPressed
+                    ? Color(red: 0.12, green: 0.43, blue: 0.19)
+                    : Color(red: 0.075, green: 0.07, blue: 0.06)
+            )
+            .foregroundColor(configuration.isPressed ? .white : Color.white.opacity(0.9))
+            .overlay {
+                Rectangle()
+                    .stroke(
+                        configuration.isPressed
+                            ? Color(red: 0.84, green: 0.75, blue: 0.48)
+                            : Color(red: 0.58, green: 0.54, blue: 0.45).opacity(0.9),
+                        lineWidth: configuration.isPressed ? 2.5 : 1.5
+                    )
+            }
+            .contentShape(Rectangle())
+            .scaleEffect(configuration.isPressed ? 0.96 : 1)
+            .animation(.easeOut(duration: 0.09), value: configuration.isPressed)
     }
 }

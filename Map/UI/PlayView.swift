@@ -55,7 +55,10 @@ struct PlayView: View {
                 }
             }
 
-            // ② メッセージ(段階案内と状況メッセージを、固定の高さに表示する)
+            // ステージと鍵の状態は、イベントメッセージが変わっても常に確認できる
+            statusBar
+
+            // ② メッセージ(段階案内と状況メッセージを固定の高さに表示する)
             Text(displayedMessage)
                 .font(.system(size: 14))
                 .foregroundColor(.white)
@@ -106,5 +109,48 @@ struct PlayView: View {
                 isShowingKeyAcquisition = false
             }
         }
+    }
+
+    private var statusBar: some View {
+        let keyText: String
+        if !game.state.requiresKey {
+            keyText = "不要"
+        } else {
+            keyText = game.state.hasKey ? "所持" : "未取得"
+        }
+
+        return HStack(spacing: 8) {
+            Text(game.stage.title)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(Color(red: 0.88, green: 0.84, blue: 0.73))
+
+            Spacer(minLength: 8)
+
+            HStack(spacing: 5) {
+                Image("key")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 19, height: 19)
+                    .opacity(game.state.hasKey ? 1 : 0.34)
+
+                Text("鍵：\(keyText)")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(
+                        game.state.hasKey
+                            ? Color(red: 1.0, green: 0.83, blue: 0.36)
+                            : Color.white.opacity(0.84)
+                    )
+            }
+        }
+        .padding(.horizontal, 12)
+        .frame(maxWidth: .infinity, minHeight: 34)
+        .background(Color(red: 0.075, green: 0.07, blue: 0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+        .overlay {
+            RoundedRectangle(cornerRadius: 6)
+                .stroke(Color(red: 0.42, green: 0.39, blue: 0.32), lineWidth: 1)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(game.stage.title)。鍵：\(keyText)")
     }
 }
