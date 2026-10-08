@@ -8,6 +8,8 @@ struct Stage {
     let map: MapData
     /// Gでクリアするのに鍵が必要か(仕様書§3.3)
     let requiresKey: Bool
+    /// 案内に合わせてチュートリアルの段階を進めるか
+    let isStepByStepTutorial: Bool
 }
 
 /// 各面のマップ定義(仕様書 付録A)
@@ -16,24 +18,21 @@ enum Stages {
     /// スタート画面に並べる面の一覧(表示順)
     static let all: [Stage] = [tutorial, honban]
 
-    /// チュートリアル(付録A.1)。S から G までの練習用。鍵は不要。
-    /// 列は Excel の B〜F、行は 5〜14 に対応
+    /// チュートリアル(付録A.1)。前進・横移動・探索マップ・鍵取得・ゴールを段階的に練習する
     static let tutorial: Stage = make(
         title: "チュートリアル",
         rows: [
-            "####.",  // 5
-            "####.",  // 6
-            "####.",  // 7
-            "####.",  // 8
-            ".....",  // 9
-            "##.#.",  // 10
-            "##G#.",  // 11
-            "####.",  // 12
-            "####.",  // 13
-            "####S",  // 14
+            "#######",
+            "##G####",
+            "##.####",
+            "##.####",
+            "#.K...#",
+            "#####S#",
+            "#######",
         ],
         initialDirection: .north,
-        requiresKey: false
+        requiresKey: true,
+        isStepByStepTutorial: true
     )
 
     /// 本番(付録A.2)。鍵が必要。
@@ -56,7 +55,8 @@ enum Stages {
             "##.#####",  // 14
         ],
         initialDirection: .east,
-        requiresKey: true
+        requiresKey: true,
+        isStepByStepTutorial: false
     )
 
     /// マップ定義の文字列から、面を作る。S が無い定義は、開発中のミスなので停止する
@@ -64,11 +64,17 @@ enum Stages {
         title: String,
         rows: [String],
         initialDirection: Direction,
-        requiresKey: Bool
+        requiresKey: Bool,
+        isStepByStepTutorial: Bool = false
     ) -> Stage {
         guard let map = MapLoader.load(rows: rows, initialDirection: initialDirection) else {
             fatalError("\(title)のマップ定義に S がありません")
         }
-        return Stage(title: title, map: map, requiresKey: requiresKey)
+        return Stage(
+            title: title,
+            map: map,
+            requiresKey: requiresKey,
+            isStepByStepTutorial: isStepByStepTutorial
+        )
     }
 }

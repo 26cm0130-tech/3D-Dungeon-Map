@@ -12,20 +12,59 @@ struct PlayView: View {
     @State private var isConfirmingGiveUp = false
     /// 鍵取得演出を表示中か
     @State private var isShowingKeyAcquisition = false
+    /// 直近のフリック方向を矢印ガイドに表示する
+    @State private var activeFlickDirection: MovementFlickDirection?
 
     /// プレイヤーが鍵のあるマスにいるか
     private var isStandingAtKey: Bool {
         game.map.cell(at: game.state.player.position) == .key
     }
 
-    /// 添付画面で正面を示す、カーソルが左（西）を指す向き
-    private var isFacingKeyChest: Bool {
-        game.state.player.direction == .west
+    /// イベントの状況メッセージを優先し、なければチュートリアル案内を表示する
+    private var displayedMessage: String {
+        game.state.message.isEmpty
+            ? game.state.tutorialStep?.instruction ?? ""
+            : game.state.message
+    }
+
+    private func finishFlick(in direction: MovementFlickDirection) {
+        activeFlickDirection = direction
+    }
+
+    /// ダンジョン画面、ステータス、メッセージ、探索マップからフリック操作を受け付ける。
+    private var movementFlickGesture: some Gesture {
+        DragGesture(minimumDistance: 10)
+            .onChanged { value in
+                if let direction = MovementFlickDirection.classify(
+                    horizontal: value.translation.width,
+                    vertical: value.translation.height,
+                    threshold: 16
+                ) {
+                    activeFlickDirection = direction
+                }
+            }
+            .onEnded { value in
+                let horizontal = value.translation.width
+                let vertical = value.translation.height
+                guard let direction = MovementFlickDirection.classify(
+                    horizontal: horizontal,
+                    vertical: vertical,
+                    threshold: 28
+                ) else { return }
+
+                finishFlick(in: direction)
+                switch direction {
+                case .left: game.turnLeft()
+                case .forward: game.moveForward()
+                case .right: game.turnRight()
+                case .backward: game.turnAround()
+                }
+            }
     }
 
     var body: some View {
         VStack(spacing: 12) {
-            // ① 3Dダンジョン
+            // ① ダンジョン画面
             DungeonView(
                 map: game.map,
                 player: game.state.player
@@ -35,7 +74,6 @@ struct PlayView: View {
                     KeyAcquisitionView(
                         hasKey: game.state.hasKey,
                         isAcquiringKey: isShowingKeyAcquisition,
-                        isFacingChest: isFacingKeyChest,
                         onFinished: {
                             withAnimation(.easeOut(duration: 0.2)) {
                                 isShowingKeyAcquisition = false
@@ -46,26 +84,46 @@ struct PlayView: View {
                     .transition(.opacity)
                 }
             }
+            .contentShape(Rectangle())
+            .simultaneousGesture(movementFlickGesture)
 
-            // ② メッセージ(1行分の高さを確保し、画面が動かないようにする)
-            Text(game.state.message)
-                .font(.system(size: 15))
+            // ステージと鍵の状態は、イベントメッセージが変わっても常に確認できる
+            statusBar
+                .contentShape(Rectangle())
+                .simultaneousGesture(movementFlickGesture)
+
+            // ② メッセージ(段階案内と状況メッセージを固定の高さに表示する)
+            Text(displayedMessage)
+                .font(.system(size: 16, weight: .medium))
                 .foregroundColor(.white)
-                .frame(height: 24)
+                .lineLimit(2)
+                .lineSpacing(2)
+                .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.75)
+                .frame(maxWidth: .infinity)
+                .frame(height: 48)
+                .contentShape(Rectangle())
+                .simultaneousGesture(movementFlickGesture)
 
-            // ③ オートマップ
+            // ③ 探索マップ
             AutoMapView(
                 map: game.map,
                 explored: game.state.explored,
                 player: game.state.player
             )
-            .frame(maxWidth: .infinity, minHeight: 120, maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
+            .frame(height: 210)
+            .contentShape(Rectangle())
+            .simultaneousGesture(movementFlickGesture)
 
             // ④ コマンド
             CommandView(
                 onTurnLeft: game.turnLeft,
                 onForward: game.moveForward,
                 onTurnRight: game.turnRight,
+                onTurnAround: game.turnAround,
+                activeFlickDirection: $activeFlickDirection,
+                onFlickEnded: { finishFlick(in: $0) },
                 onGiveUp: { isConfirmingGiveUp = true }   // まず確認を表示する
             )
         }
@@ -94,5 +152,48 @@ struct PlayView: View {
                 isShowingKeyAcquisition = false
             }
         }
+    }
+
+    private var statusBar: some View {
+        let keyText: String
+        if !game.state.requiresKey {
+            keyText = "不要"
+        } else {
+            keyText = game.state.hasKey ? "所持" : "未取得"
+        }
+
+        return HStack(spacing: 8) {
+            Text(game.stage.title)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(Color(red: 0.88, green: 0.84, blue: 0.73))
+
+            Spacer(minLength: 8)
+
+            HStack(spacing: 5) {
+                Image("key")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 19, height: 19)
+                    .opacity(game.state.hasKey ? 1 : 0.34)
+
+                Text("鍵：\(keyText)")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(
+                        game.state.hasKey
+                            ? Color(red: 1.0, green: 0.83, blue: 0.36)
+                            : Color.white.opacity(0.84)
+                    )
+            }
+        }
+        .padding(.horizontal, 12)
+        .frame(maxWidth: .infinity, minHeight: 34)
+        .background(Color(red: 0.075, green: 0.07, blue: 0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+        .overlay {
+            RoundedRectangle(cornerRadius: 6)
+                .stroke(Color(red: 0.42, green: 0.39, blue: 0.32), lineWidth: 1)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(game.stage.title)。鍵：\(keyText)")
     }
 }

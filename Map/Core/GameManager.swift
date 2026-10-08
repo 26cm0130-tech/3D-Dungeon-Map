@@ -18,28 +18,55 @@ final class GameManager: ObservableObject {
         self.state = GameState(
             start: stage.map.startPosition,
             direction: stage.map.initialDirection,
-            requiresKey: stage.requiresKey
+            requiresKey: stage.requiresKey,
+            isStepByStepTutorial: stage.isStepByStepTutorial
         )
     }
 
     // MARK: 操作
 
     func turnLeft() {
-        var newState = state
-        newState.player.direction = newState.player.direction.turnedLeft
-        state = newState
+        turn(to: state.player.direction.turnedLeft, tutorialAction: .turnLeft)
     }
 
     func turnRight() {
-        var newState = state
-        newState.player.direction = newState.player.direction.turnedRight
-        state = newState
+        turn(to: state.player.direction.turnedRight, tutorialAction: .turnRight)
     }
 
     func moveForward() {
-        let next = state.player.position.moved(state.player.direction)
+        moveOneTile(
+            in: state.player.direction,
+            action: .moveForward,
+            blockedMessage: "前方は壁です。左右に向きを変えて進路を探そう！"
+        )
+    }
+
+    func turnAround() {
+        turn(to: state.player.direction.reversed)
+    }
+
+    private func turn(to direction: Direction, tutorialAction: TutorialAction? = nil) {
+        guard !state.isCleared else { return }
+        var newState = state
+        newState.player.direction = direction
+        newState.message = ""
+        if let tutorialAction {
+            newState.recordTutorialAction(tutorialAction)
+        }
+        state = newState
+    }
+
+    /// 指定した方向へ1マス進み、壁・イベント・探索済み状態をまとめて処理する。
+    private func moveOneTile(in direction: Direction, action: TutorialAction, blockedMessage: String) {
+        guard !state.isCleared else { return }
+        let next = state.player.position.moved(direction)
         let cell = map.cell(at: next)
-        if cell.isWall { return }
+        if cell.isWall {
+            var newState = state
+            newState.message = blockedMessage
+            state = newState
+            return
+        }
 
         // マスごとの特殊処理(T・K・G)は Events に任せる
         let event = TileEvents.event(for: cell)
@@ -54,6 +81,7 @@ final class GameManager: ObservableObject {
         newState.player.position = next
         newState.explored.insert(next)
         newState.message = ""
+        newState.recordTutorialAction(action)
         event?.onEnter(state: &newState)
         state = newState
 

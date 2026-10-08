@@ -23,8 +23,19 @@ struct AutoMapView: View {
                 let o = origin(pos.x, pos.y)
                 let r = CGRect(x: o.x, y: o.y, width: cell, height: cell)
 
-                // 探索済みの床
-                ctx.fill(Path(r), with: .color(Color.white.opacity(0.12)))
+                // 到達したマスだけ緑に色づけし、特殊地点は控えめな色で区別する
+                let floorColor: Color
+                switch map.cell(at: pos) {
+                case .trap:
+                    floorColor = Color(red: 0.42, green: 0.15, blue: 0.10)
+                case .key:
+                    floorColor = Color(red: 0.48, green: 0.34, blue: 0.08)
+                case .goal:
+                    floorColor = Color(red: 0.48, green: 0.19, blue: 0.12)
+                default:
+                    floorColor = Color(red: 0.055, green: 0.47, blue: 0.12)
+                }
+                ctx.fill(Path(r), with: .color(floorColor))
 
                 // 確認済みの壁(そのマスの四辺のうち、隣が壁の辺)
                 for k in 0..<4 {
@@ -45,15 +56,30 @@ struct AutoMapView: View {
                         p.move(to: CGPoint(x: r.minX, y: r.minY))
                         p.addLine(to: CGPoint(x: r.minX, y: r.maxY))
                     }
-                    ctx.stroke(p, with: .color(.white), lineWidth: 2)
+                    ctx.stroke(
+                        p,
+                        with: .color(Color(red: 0.72, green: 0.67, blue: 0.54)),
+                        lineWidth: max(1.2, min(2.5, cell * 0.07))
+                    )
                 }
 
                 // 到達済みの特殊マスだけ記号を表示(未到達のT/K/Gは出さない)
                 if let symbol = map.cell(at: pos).mapSymbol, pos != player.position {
+                    let symbolColor: Color
+                    switch map.cell(at: pos) {
+                    case .trap:
+                        symbolColor = Color(red: 1.0, green: 0.66, blue: 0.46)
+                    case .key:
+                        symbolColor = Color(red: 1.0, green: 0.86, blue: 0.42)
+                    case .goal:
+                        symbolColor = Color(red: 1.0, green: 0.88, blue: 0.69)
+                    default:
+                        symbolColor = .white
+                    }
                     ctx.draw(
                         Text(symbol)
                             .font(.system(size: cell * 0.6, weight: .bold))
-                            .foregroundColor(.white),
+                            .foregroundColor(symbolColor),
                         at: CGPoint(x: r.midX, y: r.midY)
                     )
                 }
@@ -78,10 +104,13 @@ struct AutoMapView: View {
                 }
             }
             tri.closeSubpath()
-            ctx.fill(tri, with: .color(.white))
+            ctx.fill(tri, with: .color(Color(red: 1.0, green: 0.94, blue: 0.72)))
         }
-        .background(Color.black)
+        .background(Color(red: 0.025, green: 0.024, blue: 0.022))
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.8), lineWidth: 2))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color(red: 0.48, green: 0.44, blue: 0.36).opacity(0.8), lineWidth: 1.5)
+        }
     }
 }
