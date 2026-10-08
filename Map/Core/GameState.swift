@@ -62,7 +62,7 @@ struct GameState {
             self.tutorialStep = .turnDirection
         case (.turnDirection, .turnLeft), (.turnDirection, .turnRight):
             self.tutorialStep = .checkMap
-        case (.checkMap, .moveForward):
+        case (.checkMap, .moveForward), (.checkMap, .turnLeft), (.checkMap, .turnRight):
             self.tutorialStep = .findKey
         default:
             break

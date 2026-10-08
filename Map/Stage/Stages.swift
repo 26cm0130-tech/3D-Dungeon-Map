@@ -18,7 +18,7 @@ enum Stages {
     /// スタート画面に並べる面の一覧(表示順)
     static let all: [Stage] = [tutorial, honban]
 
-    /// チュートリアル(付録A.1)。前進・横移動・探索マップ・鍵取得・ゴールを段階的に練習する
+    /// チュートリアル(付録A.1)。前進・方向転換・探索マップ・鍵取得・ゴールを段階的に練習する
     static let tutorial: Stage = make(
         title: "チュートリアル",
         rows: [

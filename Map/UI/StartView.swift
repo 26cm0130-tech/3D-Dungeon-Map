@@ -49,6 +49,12 @@ struct StartView: View {
                         .foregroundStyle(Color.white.opacity(0.84))
                         .frame(maxWidth: 340)
 
+                    Text("前進は1マス、左右は向きを変える操作です。\n鍵を取ってゴールへ進みましょう。")
+                        .font(.system(size: 14, weight: .medium, design: .serif))
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(Color.white.opacity(0.85))
+                        .frame(maxWidth: 320)
+
                     // 面を選ぶボタン(コマンドボタンと同じ様式)
                     VStack(spacing: 16) {
                         ForEach(stages.indices, id: \.self) { index in
