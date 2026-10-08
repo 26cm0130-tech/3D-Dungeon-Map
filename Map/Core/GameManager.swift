@@ -26,30 +26,44 @@ final class GameManager: ObservableObject {
     // MARK: 操作
 
     func turnLeft() {
-        guard !state.isCleared else { return }
-        var newState = state
-        newState.player.direction = newState.player.direction.turnedLeft
-        newState.message = ""
-        newState.recordTutorialAction(.turn)
-        state = newState
+        turn(to: state.player.direction.turnedLeft, tutorialAction: .turnLeft)
     }
 
     func turnRight() {
-        guard !state.isCleared else { return }
-        var newState = state
-        newState.player.direction = newState.player.direction.turnedRight
-        newState.message = ""
-        newState.recordTutorialAction(.turn)
-        state = newState
+        turn(to: state.player.direction.turnedRight, tutorialAction: .turnRight)
     }
 
     func moveForward() {
+        moveOneTile(
+            in: state.player.direction,
+            action: .moveForward,
+            blockedMessage: "前方は壁です。左右に向きを変えて進路を探そう！"
+        )
+    }
+
+    func turnAround() {
+        turn(to: state.player.direction.reversed)
+    }
+
+    private func turn(to direction: Direction, tutorialAction: TutorialAction? = nil) {
         guard !state.isCleared else { return }
-        let next = state.player.position.moved(state.player.direction)
+        var newState = state
+        newState.player.direction = direction
+        newState.message = ""
+        if let tutorialAction {
+            newState.recordTutorialAction(tutorialAction)
+        }
+        state = newState
+    }
+
+    /// 指定した方向へ1マス進み、壁・イベント・探索済み状態をまとめて処理する。
+    private func moveOneTile(in direction: Direction, action: TutorialAction, blockedMessage: String) {
+        guard !state.isCleared else { return }
+        let next = state.player.position.moved(direction)
         let cell = map.cell(at: next)
         if cell.isWall {
             var newState = state
-            newState.message = "前方は壁です。左右に向きを変えて進路を探しましょう。"
+            newState.message = blockedMessage
             state = newState
             return
         }
@@ -67,7 +81,7 @@ final class GameManager: ObservableObject {
         newState.player.position = next
         newState.explored.insert(next)
         newState.message = ""
-        newState.recordTutorialAction(.moveForward)
+        newState.recordTutorialAction(action)
         event?.onEnter(state: &newState)
         state = newState
 

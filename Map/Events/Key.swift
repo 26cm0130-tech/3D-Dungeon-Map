@@ -7,7 +7,7 @@ struct KeyEvent: TileEvent {
         state.hasKey = true
         if !alreadyHadKey && state.tutorialStep == .findKey {
             state.tutorialStep = .reachGoal
-            state.message = "鍵を手に入れた。ゴールへ進みましょう。"
+            state.message = "鍵を手に入れた！ゴールを探そう！"
         } else {
             state.message = alreadyHadKey ? "空の宝箱がある" : "鍵を手に入れた"
         }

@@ -12,18 +12,54 @@ struct PlayView: View {
     @State private var isConfirmingGiveUp = false
     /// 鍵取得演出を表示中か
     @State private var isShowingKeyAcquisition = false
+    /// 直近のフリック方向を矢印ガイドに表示する
+    @State private var activeFlickDirection: MovementFlickDirection?
 
     /// プレイヤーが鍵のあるマスにいるか
     private var isStandingAtKey: Bool {
         game.map.cell(at: game.state.player.position) == .key
     }
 
-    /// イベントの状況メッセージを優先し、なければ現在のチュートリアル案内を表示する
+    /// イベントの状況メッセージを優先し、なければチュートリアル案内を表示する
     private var displayedMessage: String {
-        if !game.state.message.isEmpty {
-            return game.state.message
-        }
-        return game.state.tutorialStep?.instruction ?? ""
+        game.state.message.isEmpty
+            ? game.state.tutorialStep?.instruction ?? ""
+            : game.state.message
+    }
+
+    private func finishFlick(in direction: MovementFlickDirection) {
+        activeFlickDirection = direction
+    }
+
+    /// ダンジョン画面、ステータス、メッセージ、探索マップからフリック操作を受け付ける。
+    private var movementFlickGesture: some Gesture {
+        DragGesture(minimumDistance: 10)
+            .onChanged { value in
+                if let direction = MovementFlickDirection.classify(
+                    horizontal: value.translation.width,
+                    vertical: value.translation.height,
+                    threshold: 16
+                ) {
+                    activeFlickDirection = direction
+                }
+            }
+            .onEnded { value in
+                let horizontal = value.translation.width
+                let vertical = value.translation.height
+                guard let direction = MovementFlickDirection.classify(
+                    horizontal: horizontal,
+                    vertical: vertical,
+                    threshold: 28
+                ) else { return }
+
+                finishFlick(in: direction)
+                switch direction {
+                case .left: game.turnLeft()
+                case .forward: game.moveForward()
+                case .right: game.turnRight()
+                case .backward: game.turnAround()
+                }
+            }
     }
 
     var body: some View {
@@ -48,19 +84,26 @@ struct PlayView: View {
                     .transition(.opacity)
                 }
             }
+            .contentShape(Rectangle())
+            .simultaneousGesture(movementFlickGesture)
 
             // ステージと鍵の状態は、イベントメッセージが変わっても常に確認できる
             statusBar
+                .contentShape(Rectangle())
+                .simultaneousGesture(movementFlickGesture)
 
             // ② メッセージ(段階案内と状況メッセージを固定の高さに表示する)
             Text(displayedMessage)
-                .font(.system(size: 14))
+                .font(.system(size: 16, weight: .medium))
                 .foregroundColor(.white)
-                .lineLimit(3)
+                .lineLimit(2)
+                .lineSpacing(2)
                 .multilineTextAlignment(.center)
-                .minimumScaleFactor(0.85)
+                .minimumScaleFactor(0.75)
                 .frame(maxWidth: .infinity)
                 .frame(height: 48)
+                .contentShape(Rectangle())
+                .simultaneousGesture(movementFlickGesture)
 
             // ③ 探索マップ
             AutoMapView(
@@ -68,13 +111,19 @@ struct PlayView: View {
                 explored: game.state.explored,
                 player: game.state.player
             )
-            .frame(maxWidth: .infinity, minHeight: 120, maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
+            .frame(height: 210)
+            .contentShape(Rectangle())
+            .simultaneousGesture(movementFlickGesture)
 
             // ④ コマンド
             CommandView(
                 onTurnLeft: game.turnLeft,
                 onForward: game.moveForward,
                 onTurnRight: game.turnRight,
+                onTurnAround: game.turnAround,
+                activeFlickDirection: $activeFlickDirection,
+                onFlickEnded: { finishFlick(in: $0) },
                 onGiveUp: { isConfirmingGiveUp = true }   // まず確認を表示する
             )
         }

@@ -3,7 +3,7 @@ import Foundation
 /// チュートリアルで表示する案内の段階
 enum TutorialStep: Equatable {
     case moveForward
-    case turn
+    case turnDirection
     case checkMap
     case findKey
     case reachGoal
@@ -11,15 +11,15 @@ enum TutorialStep: Equatable {
     var instruction: String {
         switch self {
         case .moveForward:
-            return "ステップ1/5：前進は1マスです。「前進」を押してみましょう。"
-        case .turn:
-            return "ステップ2/5：左右は向きを変えます。曲がり角で使ってみましょう。"
+            return "ステップ1/5：上フリックで1マス進もう！"
+        case .turnDirection:
+            return "ステップ2/5：左右フリックで向きを変えよう！"
         case .checkMap:
-            return "ステップ3/5：上のダンジョン画面で進む方向を見て、下の探索マップで現在地を確認しましょう。"
+            return "ステップ3/5：上のダンジョン画面で進む方向を見て、下の探索マップで現在地を確認しよう！"
         case .findKey:
-            return "ステップ4/5：鍵を取ってゴールへ。宝箱を探しましょう。"
+            return "ステップ4/5：宝箱を探して鍵を見つけよう！"
         case .reachGoal:
-            return "ステップ5/5：鍵を手に入れました。ゴールへ進みましょう。"
+            return "ステップ5/5：鍵を手に入れた！ゴールを探そう！"
         }
     }
 }
@@ -27,7 +27,8 @@ enum TutorialStep: Equatable {
 /// 案内を次の段階へ進める操作の種類
 enum TutorialAction {
     case moveForward
-    case turn
+    case turnLeft
+    case turnRight
 }
 
 /// ゲーム全体の状態(仕様書§11)
@@ -58,10 +59,10 @@ struct GameState {
 
         switch (tutorialStep, action) {
         case (.moveForward, .moveForward):
-            self.tutorialStep = .turn
-        case (.turn, .turn):
+            self.tutorialStep = .turnDirection
+        case (.turnDirection, .turnLeft), (.turnDirection, .turnRight):
             self.tutorialStep = .checkMap
-        case (.checkMap, .moveForward), (.checkMap, .turn):
+        case (.checkMap, .moveForward), (.checkMap, .turnLeft), (.checkMap, .turnRight):
             self.tutorialStep = .findKey
         default:
             break
