@@ -14,6 +14,8 @@ struct PlayView: View {
     @State private var isShowingKeyAcquisition = false
     /// 直近のフリック方向を矢印ガイドに表示する
     @State private var activeFlickDirection: MovementFlickDirection?
+    /// プレイヤーの位置・向きが変わるたびに、メッセージ横のモンスターを動かす
+    @State private var monsterReactionID = 0
 
     /// プレイヤーが鍵のあるマスにいるか
     private var isStandingAtKey: Bool {
@@ -23,8 +25,12 @@ struct PlayView: View {
     /// イベントの状況メッセージを優先し、なければチュートリアル案内を表示する
     private var displayedMessage: String {
         game.state.message.isEmpty
-            ? game.state.tutorialStep?.instruction ?? ""
+            ? game.state.tutorialStep?.instruction ?? "迷宮を探索しよう"
             : game.state.message
+    }
+
+    private var playerMotionKey: String {
+        "\(game.state.player.position.x),\(game.state.player.position.y),\(game.state.player.direction.rawValue)"
     }
 
     private func finishFlick(in direction: MovementFlickDirection) {
@@ -93,15 +99,7 @@ struct PlayView: View {
                 .simultaneousGesture(movementFlickGesture)
 
             // ② メッセージ(段階案内と状況メッセージを固定の高さに表示する)
-            Text(displayedMessage)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundColor(.white)
-                .lineLimit(2)
-                .lineSpacing(2)
-                .multilineTextAlignment(.center)
-                .minimumScaleFactor(0.75)
-                .frame(maxWidth: .infinity)
-                .frame(height: 48)
+            MonsterMessageView(message: displayedMessage, reactionID: monsterReactionID)
                 .contentShape(Rectangle())
                 .simultaneousGesture(movementFlickGesture)
 
@@ -152,6 +150,9 @@ struct PlayView: View {
                 isShowingKeyAcquisition = false
             }
         }
+        .onChange(of: playerMotionKey) { _, _ in
+            monsterReactionID += 1
+        }
     }
 
     private var statusBar: some View {
@@ -163,9 +164,17 @@ struct PlayView: View {
         }
 
         return HStack(spacing: 8) {
-            Text(game.stage.title)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(Color(red: 0.88, green: 0.84, blue: 0.73))
+            VStack(alignment: .leading, spacing: 1) {
+                Text(game.stage.title)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(Color(red: 0.88, green: 0.84, blue: 0.73))
+                if let seed = game.stage.seed {
+                    Text("SEED \(String(format: "%016llX", seed))")
+                        .font(.system(size: 9, weight: .medium, design: .monospaced))
+                        .foregroundColor(.white.opacity(0.6))
+                        .accessibilityLabel("seed \(seed)")
+                }
+            }
 
             Spacer(minLength: 8)
 
@@ -194,6 +203,6 @@ struct PlayView: View {
                 .stroke(Color(red: 0.42, green: 0.39, blue: 0.32), lineWidth: 1)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(game.stage.title)。鍵：\(keyText)")
+        .accessibilityLabel("\(game.stage.title)\(game.stage.seed.map { "。seed \($0)" } ?? "")。鍵：\(keyText)")
     }
 }

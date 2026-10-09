@@ -7,6 +7,7 @@ struct ClearView: View {
     let onReturn: () -> Void
 
     @State private var clearAudioPlayer: AVAudioPlayer?
+    @State private var clearAudioErrorDelegate: AudioPlaybackErrorDelegate?
 
     var body: some View {
         ZStack {
@@ -44,15 +45,17 @@ struct ClearView: View {
             .padding(32)
         }
         .onAppear {
-            guard let url = Bundle.main.url(forResource: "レトロなゲームクリア音", withExtension: "mp3"),
-                  let player = try? AVAudioPlayer(contentsOf: url) else { return }
-            player.prepareToPlay()
-            player.play()
+            guard let player = AudioPlayback.makePlayer(named: "レトロなゲームクリア音") else { return }
+            let errorDelegate = AudioPlaybackErrorDelegate(resourceName: "レトロなゲームクリア音")
+            player.delegate = errorDelegate
+            guard AudioPlayback.play(player, named: "レトロなゲームクリア音") else { return }
             clearAudioPlayer = player
+            clearAudioErrorDelegate = errorDelegate
         }
         .onDisappear {
             clearAudioPlayer?.stop()
             clearAudioPlayer = nil
+            clearAudioErrorDelegate = nil
         }
     }
 }

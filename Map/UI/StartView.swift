@@ -4,8 +4,14 @@ import SwiftUI
 struct StartView: View {
     /// 選べる面の一覧(表示順)
     let stages: [Stage]
+    /// 前回のランダムステージseed。再挑戦に使う
+    let lastRandomSeed: UInt64?
     /// 面が選ばれたときの処理
     let onSelect: (Stage) -> Void
+    /// 新しいランダムステージを始める処理
+    let onRandomStage: () -> Void
+    /// 前回のseedで同じランダムステージを始める処理
+    let onReplayRandomStage: (UInt64) -> Void
 
     var body: some View {
         ZStack {
@@ -17,61 +23,102 @@ struct StartView: View {
             .ignoresSafeArea()
 
             ScrollView {
-                VStack(spacing: 19) {
+                VStack(spacing: 8) {
                     DungeonGateEmblem()
-                        .frame(width: 148, height: 132)
-                        .padding(.top, 28)
+                        .frame(width: 100, height: 88)
+                        .padding(.top, 12)
 
                     VStack(spacing: 0) {
-                        Text("What's gathered?")
-                            .font(.system(size: 32, weight: .bold, design: .serif))
-                            .minimumScaleFactor(0.85)
-                            .lineLimit(1)
-                        Text("Run!")
-                            .font(.system(size: 58, weight: .heavy, design: .serif))
-                            .padding(.top, -5)
+                        VStack(spacing: -4) {
+                            Text("What's gathered?")
+                                .font(.system(size: 29, weight: .bold, design: .serif))
+                                .minimumScaleFactor(0.85)
+                                .lineLimit(1)
+                            Text("Run!")
+                                .font(.system(size: 52, weight: .heavy, design: .serif))
+                        }
                         Text("ワギャラン")
-                            .font(.system(size: 22, weight: .semibold, design: .serif))
+                            .font(.system(size: 20, weight: .semibold, design: .serif))
                             .tracking(4)
-                            .padding(.top, 1)
+                            .padding(.top, 5)
                     }
                     .foregroundStyle(Color(red: 0.89, green: 0.78, blue: 0.49))
                     .accessibilityElement(children: .combine)
 
                     Rectangle()
                         .fill(Color(red: 0.64, green: 0.52, blue: 0.29).opacity(0.8))
-                        .frame(width: 230, height: 1.5)
-                        .padding(.vertical, 5)
+                        .frame(width: 190, height: 1.5)
+                        .padding(.vertical, 2)
 
-                    Text("ファミコン時代の\nWizardry・女神転生を思わせる、\nグリッド型の3Dダンジョン探索ゲーム")
-                        .font(.system(size: 15, weight: .medium, design: .serif))
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(Color.white.opacity(0.84))
-                        .frame(maxWidth: 340)
+                    VStack(spacing: 7) {
+                        Text("ファミコン時代の Wizardry・女神転生を思わせる、\nグリッド型の3Dダンジョン探索ゲーム")
+                            .font(.system(size: 13, weight: .medium, design: .serif))
+                            .foregroundStyle(Color.white.opacity(0.78))
 
-                    Text("前進は1マス、左右は向きを変える操作です。\n鍵を取ってゴールへ進みましょう。")
-                        .font(.system(size: 14, weight: .medium, design: .serif))
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(Color.white.opacity(0.85))
-                        .frame(maxWidth: 320)
+                        Text("鍵を見つけ、石造りの迷宮を抜けて\nゴールを目指そう")
+                            .font(.system(size: 15, weight: .semibold, design: .serif))
+                            .foregroundStyle(Color.white.opacity(0.96))
+                    }
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 360)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 11)
+                    .background(Color.white.opacity(0.045), in: RoundedRectangle(cornerRadius: 10))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color(red: 0.67, green: 0.57, blue: 0.36).opacity(0.48), lineWidth: 1)
+                    }
 
-                    // 面を選ぶボタン(コマンドボタンと同じ様式)
-                    VStack(spacing: 16) {
+                    AnimatedTitleMonsterView()
+                        .frame(height: 68)
+
+                    Text("探索モードを選ぶ")
+                        .font(.system(size: 18, weight: .bold, design: .serif))
+                        .foregroundStyle(Color(red: 0.89, green: 0.78, blue: 0.49))
+                        .frame(maxWidth: 360, alignment: .leading)
+                        .padding(.top, 3)
+
+                    VStack(spacing: 10) {
                         ForEach(stages.indices, id: \.self) { index in
                             let stage = stages[index]
-                            Button {
+                            modeButton(
+                                title: stage.title,
+                                symbol: stage.isStepByStepTutorial ? "book.closed.fill" : "shield.fill",
+                                subtitle: stage.isStepByStepTutorial
+                                    ? "操作と鍵の取り方を練習"
+                                    : "固定マップを探索"
+                            ) {
                                 onSelect(stage)
-                            } label: {
-                                Text(stage.title)
-                                    .font(.system(size: 20, weight: .bold, design: .serif))
-                                    .frame(maxWidth: .infinity, minHeight: 60)
                             }
-                            .buttonStyle(DungeonPressButtonStyle())
+                        }
+
+                        modeButton(
+                            title: "ランダムステージ",
+                            symbol: "shuffle",
+                            subtitle: "通路とイベントが毎回変わる"
+                        ) {
+                            onRandomStage()
+                        }
+
+                        if let lastRandomSeed {
+                            modeButton(
+                                title: "前回の迷宮を再現",
+                                symbol: "arrow.clockwise",
+                                subtitle: "SEED \(seedText(lastRandomSeed))"
+                            ) {
+                                onReplayRandomStage(lastRandomSeed)
+                            }
                         }
                     }
-                    .frame(maxWidth: 320)
-                    .padding(.top, 3)
-                    .padding(.bottom, 24)
+                    .frame(maxWidth: 360)
+
+                    Text("上フリックで前進、左右で旋回、下で反転。\n鍵を手に入れてゴールへ。")
+                        .font(.system(size: 13, weight: .medium, design: .serif))
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(Color.white.opacity(0.76))
+                        .frame(maxWidth: 360)
+                        .padding(.top, 2)
+                        .padding(.bottom, 20)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 26)
@@ -89,6 +136,43 @@ struct StartView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .preferredColorScheme(.dark)
+    }
+
+    private func modeButton(
+        title: String,
+        symbol: String,
+        subtitle: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 13) {
+                Image(systemName: symbol)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Color(red: 0.89, green: 0.78, blue: 0.49))
+                    .frame(width: 34, height: 34)
+                    .background(Color.white.opacity(0.06), in: Circle())
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.system(size: 18, weight: .bold, design: .serif))
+                        .foregroundStyle(Color.white.opacity(0.95))
+                    Text(subtitle)
+                        .font(.system(size: 13, weight: .medium, design: .serif))
+                        .foregroundStyle(Color.white.opacity(0.84))
+                }
+                Spacer(minLength: 6)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(Color(red: 0.89, green: 0.78, blue: 0.49))
+            }
+            .padding(.horizontal, 15)
+            .frame(maxWidth: .infinity, minHeight: 68)
+        }
+        .buttonStyle(DungeonPressButtonStyle())
+    }
+
+    private func seedText(_ seed: UInt64) -> String {
+        String(format: "%016llX", seed)
     }
 }
 

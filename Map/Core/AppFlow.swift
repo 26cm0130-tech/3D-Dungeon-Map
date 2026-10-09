@@ -15,6 +15,7 @@ private final class AudioPlayerCompletionDelegate: NSObject, AVAudioPlayerDelega
     }
 
     func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
+        AudioPlayback.logDecodeError(for: "ドアを開ける1", error: error)
         finish()
     }
 
@@ -39,21 +40,33 @@ final class AppFlow: ObservableObject {
 
     /// 現在のプレイ(スタート画面のときは nil)
     @Published private(set) var game: GameManager?
+    /// 前回のランダムステージseed。タイトル画面から同じ迷宮を再生成できる。
+    @Published private(set) var lastRandomSeed: UInt64?
 
+    private var titleBackgroundAudioPlayer: AVAudioPlayer?
+    private var titleBackgroundAudioErrorDelegate: AudioPlaybackErrorDelegate?
     private var stageBackgroundAudioPlayer: AVAudioPlayer?
+    private var stageBackgroundAudioErrorDelegate: AudioPlaybackErrorDelegate?
     private var doorOpenAudioPlayer: AVAudioPlayer?
     private var doorOpenCompletionDelegate: AudioPlayerCompletionDelegate?
     private var isPlayingDoorOpenSequence = false
 
+    init() {
+        AudioPlayback.configureForDeviceSettings()
+        playTitleBackgroundMusic()
+    }
+
     /// 面を選んで、プレイを開始する。
     /// 毎回、新しいゲームを作るので、前回のプレイの状態は引き継がない(仕様書§13.2)
     func startGame(stage: Stage) {
+        stopTitleBackgroundMusic()
         stopStageBackgroundMusic()
         doorOpenAudioPlayer?.stop()
         doorOpenAudioPlayer = nil
         doorOpenCompletionDelegate = nil
         isPlayingDoorOpenSequence = false
         let newGame = GameManager(stage: stage)
+        lastRandomSeed = stage.seed
         // ドアの音が終わってからクリア表示に切り替える
         newGame.onCleared = { [weak self] in
             self?.playDoorOpenThenShowClear()
@@ -61,6 +74,17 @@ final class AppFlow: ObservableObject {
         game = newGame
         screen = .playing
         playStageBackgroundMusic()
+    }
+
+    /// 新しいseedでランダムステージを開始する。
+    func startRandomGame() {
+        let seed = UInt64.random(in: UInt64.min...UInt64.max)
+        startGame(stage: Stages.random(seed: seed))
+    }
+
+    /// 前回のseedを使って同じ迷宮を再生成する。
+    func replayRandomGame(seed: UInt64) {
+        startGame(stage: Stages.random(seed: seed))
     }
 
     /// スタート画面に戻る。現在のプレイの状態は破棄する
@@ -72,6 +96,7 @@ final class AppFlow: ObservableObject {
         isPlayingDoorOpenSequence = false
         game = nil
         screen = .start
+        playTitleBackgroundMusic()
     }
 
     /// ドアを開ける音を最後まで再生してからクリア画面へ進む。
@@ -81,8 +106,7 @@ final class AppFlow: ObservableObject {
         stopStageBackgroundMusic()
         let gameAtClear = game
 
-        guard let url = Bundle.main.url(forResource: "ドアを開ける1", withExtension: "mp3"),
-              let player = try? AVAudioPlayer(contentsOf: url) else {
+        guard let player = AudioPlayback.makePlayer(named: "ドアを開ける1") else {
             isPlayingDoorOpenSequence = false
             screen = .cleared
             return
@@ -101,8 +125,7 @@ final class AppFlow: ObservableObject {
         doorOpenAudioPlayer = player
         doorOpenCompletionDelegate = completionDelegate
         player.delegate = completionDelegate
-        player.prepareToPlay()
-        if !player.play() {
+        if !AudioPlayback.play(player, named: "ドアを開ける1") {
             doorOpenAudioPlayer = nil
             doorOpenCompletionDelegate = nil
             isPlayingDoorOpenSequence = false
@@ -112,18 +135,40 @@ final class AppFlow: ObservableObject {
 
     /// ステージ中のBGMをループ再生する。
     private func playStageBackgroundMusic() {
-        guard let url = Bundle.main.url(forResource: "3dmap", withExtension: "mp3"),
-              let player = try? AVAudioPlayer(contentsOf: url) else { return }
+        guard let player = AudioPlayback.makePlayer(named: "3dmap") else { return }
 
         player.numberOfLoops = -1
-        player.prepareToPlay()
-        guard player.play() else { return }
+        let errorDelegate = AudioPlaybackErrorDelegate(resourceName: "3dmap")
+        player.delegate = errorDelegate
+        guard AudioPlayback.play(player, named: "3dmap") else { return }
         stageBackgroundAudioPlayer = player
+        stageBackgroundAudioErrorDelegate = errorDelegate
+    }
+
+    /// タイトル画面のBGMをループ再生する。
+    private func playTitleBackgroundMusic() {
+        guard titleBackgroundAudioPlayer?.isPlaying != true,
+              let player = AudioPlayback.makePlayer(named: "Where_the_Stone_Eyes_Watch") else { return }
+
+        player.numberOfLoops = -1
+        let errorDelegate = AudioPlaybackErrorDelegate(resourceName: "Where_the_Stone_Eyes_Watch")
+        player.delegate = errorDelegate
+        guard AudioPlayback.play(player, named: "Where_the_Stone_Eyes_Watch") else { return }
+        titleBackgroundAudioPlayer = player
+        titleBackgroundAudioErrorDelegate = errorDelegate
+    }
+
+    /// タイトル画面を離れるときにタイトルBGMを止める。
+    private func stopTitleBackgroundMusic() {
+        titleBackgroundAudioPlayer?.stop()
+        titleBackgroundAudioPlayer = nil
+        titleBackgroundAudioErrorDelegate = nil
     }
 
     /// ステージを離れるときはBGMを止める。
     private func stopStageBackgroundMusic() {
         stageBackgroundAudioPlayer?.stop()
         stageBackgroundAudioPlayer = nil
+        stageBackgroundAudioErrorDelegate = nil
     }
 }
