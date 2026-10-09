@@ -12,7 +12,13 @@ struct ContentView: View {
             switch flow.screen {
             case .start:
                 // スタート画面(面を選ぶ)
-                StartView(stages: Stages.all, onSelect: flow.startGame)
+                StartView(
+                    stages: Stages.all,
+                    lastRandomSeed: flow.lastRandomSeed,
+                    onSelect: flow.startGame,
+                    onRandomStage: flow.startRandomGame,
+                    onReplayRandomStage: flow.replayRandomGame
+                )
 
             case .playing, .cleared:
                 // プレイ画面。クリアしたときは、上にクリア表示を重ねる

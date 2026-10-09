@@ -14,6 +14,7 @@ struct KeyAcquisitionView: View {
     @State private var keyRotation = 10.0
     @State private var chestOpenAudioPlayer: AVAudioPlayer?
     @State private var itemFoundAudioPlayer: AVAudioPlayer?
+    @State private var audioErrorDelegates: [AudioPlaybackErrorDelegate] = []
 
     var body: some View {
         GeometryReader { geometry in
@@ -126,13 +127,11 @@ struct KeyAcquisitionView: View {
 
     /// アプリに同梱した効果音を再生する
     private func playSound(named resourceName: String) -> AVAudioPlayer? {
-        guard let url = Bundle.main.url(forResource: resourceName, withExtension: "mp3"),
-              let player = try? AVAudioPlayer(contentsOf: url) else {
-            return nil
-        }
-
-        player.prepareToPlay()
-        player.play()
+        guard let player = AudioPlayback.makePlayer(named: resourceName) else { return nil }
+        let errorDelegate = AudioPlaybackErrorDelegate(resourceName: resourceName)
+        player.delegate = errorDelegate
+        guard AudioPlayback.play(player, named: resourceName) else { return nil }
+        audioErrorDelegates.append(errorDelegate)
         return player
     }
 }
