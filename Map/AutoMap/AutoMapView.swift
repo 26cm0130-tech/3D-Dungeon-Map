@@ -85,26 +85,24 @@ struct AutoMapView: View {
                 }
             }
 
-            // プレイヤー(向きを示す三角形)
+            // プレイヤーの現在位置(円形カーソル)
             let po = origin(player.position.x, player.position.y)
             let c = CGPoint(x: po.x + cell / 2, y: po.y + cell / 2)
-            let s = Double(cell) * 0.38
-            let theta = Double(player.direction.rawValue) * Double.pi / 2
-            let base: [(Double, Double)] = [(0, -1), (-0.8, 0.8), (0.8, 0.8)]
-            var tri = Path()
-            for (idx, b) in base.enumerated() {
-                let bx = b.0 * s
-                let by = b.1 * s
-                let qx = Double(c.x) + bx * cos(theta) - by * sin(theta)
-                let qy = Double(c.y) + bx * sin(theta) + by * cos(theta)
-                if idx == 0 {
-                    tri.move(to: CGPoint(x: qx, y: qy))
-                } else {
-                    tri.addLine(to: CGPoint(x: qx, y: qy))
-                }
-            }
-            tri.closeSubpath()
-            ctx.fill(tri, with: .color(Color(red: 1.0, green: 0.94, blue: 0.72)))
+            let cursorDiameter = cell * 0.56
+            let cursorRect = CGRect(
+                x: c.x - cursorDiameter / 2,
+                y: c.y - cursorDiameter / 2,
+                width: cursorDiameter,
+                height: cursorDiameter
+            )
+            ctx.fill(
+                Path(ellipseIn: cursorRect.insetBy(dx: -cell * 0.045, dy: -cell * 0.045)),
+                with: .color(Color.black.opacity(0.78))
+            )
+            ctx.fill(
+                Path(ellipseIn: cursorRect),
+                with: .color(Color(red: 1.0, green: 0.94, blue: 0.72))
+            )
         }
         .background(Color(red: 0.025, green: 0.024, blue: 0.022))
         .clipShape(RoundedRectangle(cornerRadius: 12))

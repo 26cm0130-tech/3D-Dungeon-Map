@@ -40,6 +40,7 @@ final class AppFlow: ObservableObject {
     /// 現在のプレイ(スタート画面のときは nil)
     @Published private(set) var game: GameManager?
 
+    private var stageBackgroundAudioPlayer: AVAudioPlayer?
     private var doorOpenAudioPlayer: AVAudioPlayer?
     private var doorOpenCompletionDelegate: AudioPlayerCompletionDelegate?
     private var isPlayingDoorOpenSequence = false
@@ -47,6 +48,7 @@ final class AppFlow: ObservableObject {
     /// 面を選んで、プレイを開始する。
     /// 毎回、新しいゲームを作るので、前回のプレイの状態は引き継がない(仕様書§13.2)
     func startGame(stage: Stage) {
+        stopStageBackgroundMusic()
         doorOpenAudioPlayer?.stop()
         doorOpenAudioPlayer = nil
         doorOpenCompletionDelegate = nil
@@ -58,10 +60,12 @@ final class AppFlow: ObservableObject {
         }
         game = newGame
         screen = .playing
+        playStageBackgroundMusic()
     }
 
     /// スタート画面に戻る。現在のプレイの状態は破棄する
     func returnToStart() {
+        stopStageBackgroundMusic()
         doorOpenAudioPlayer?.stop()
         doorOpenAudioPlayer = nil
         doorOpenCompletionDelegate = nil
@@ -74,6 +78,7 @@ final class AppFlow: ObservableObject {
     private func playDoorOpenThenShowClear() {
         guard !isPlayingDoorOpenSequence else { return }
         isPlayingDoorOpenSequence = true
+        stopStageBackgroundMusic()
         let gameAtClear = game
 
         guard let url = Bundle.main.url(forResource: "ドアを開ける1", withExtension: "mp3"),
@@ -103,5 +108,22 @@ final class AppFlow: ObservableObject {
             isPlayingDoorOpenSequence = false
             screen = .cleared
         }
+    }
+
+    /// ステージ中のBGMをループ再生する。
+    private func playStageBackgroundMusic() {
+        guard let url = Bundle.main.url(forResource: "3dmap", withExtension: "mp3"),
+              let player = try? AVAudioPlayer(contentsOf: url) else { return }
+
+        player.numberOfLoops = -1
+        player.prepareToPlay()
+        guard player.play() else { return }
+        stageBackgroundAudioPlayer = player
+    }
+
+    /// ステージを離れるときはBGMを止める。
+    private func stopStageBackgroundMusic() {
+        stageBackgroundAudioPlayer?.stop()
+        stageBackgroundAudioPlayer = nil
     }
 }

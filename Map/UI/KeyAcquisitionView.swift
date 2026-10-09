@@ -33,7 +33,10 @@ struct KeyAcquisitionView: View {
                             .scaledToFit()
                             .opacity(chestIsOpen ? 1 : 0)
                     }
-                    .frame(width: geometry.size.width * 0.86)
+                    .frame(
+                        width: geometry.size.width * 0.48,
+                        height: geometry.size.height * 0.42
+                    )
                     .animation(.easeInOut(duration: 0.22), value: chestIsOpen)
                     .position(
                         x: geometry.size.width / 2,
@@ -44,8 +47,8 @@ struct KeyAcquisitionView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(
-                            width: geometry.size.width * 0.36,
-                            height: geometry.size.height * 0.36
+                            width: geometry.size.width * 0.20,
+                            height: geometry.size.height * 0.22
                         )
                         .scaleEffect(keyVisible ? 1 : 0.82)
                         .rotationEffect(.degrees(keyRotation))
@@ -58,7 +61,10 @@ struct KeyAcquisitionView: View {
                     Image(hasKey ? "OpenBox" : "CloseBox")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: geometry.size.width * 0.86)
+                        .frame(
+                            width: geometry.size.width * 0.48,
+                            height: geometry.size.height * 0.42
+                        )
                         .position(
                             x: geometry.size.width / 2,
                             y: geometry.size.height * 0.60
@@ -98,7 +104,7 @@ struct KeyAcquisitionView: View {
                     }
                     withAnimation(.spring(response: 0.68, dampingFraction: 0.7)) {
                         keyVisible = true
-                        keyRise = -geometry.size.height * 0.2
+                        keyRise = -geometry.size.height * 0.14
                         keyRotation = 0
                     }
                     try? await Task.sleep(for: .milliseconds(850))
